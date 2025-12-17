@@ -6,6 +6,7 @@ import {IERC20, SafeERC20} from "@openzeppelin/contracts/token/ERC20/utils/SafeE
 import {MerkleProof} from "@openzeppelin/contracts/utils/cryptography/MerkleProof.sol";
 
 contract MerkleAirdrop {
+    using SafeERC20 for IERC20;
     // Some list of addresses
     // Allow some in the list to claim tokens
     error MerkleAirdrop__InvalidProof();
@@ -31,7 +32,7 @@ contract MerkleAirdrop {
             revert MerkleAirdrop__InvalidProof();
         }
         emit Claim(account, amount);
-        i_airdropToken.transfer(account, amount);
+        i_airdropToken.safeTransfer(account, amount);
 
     }
 
