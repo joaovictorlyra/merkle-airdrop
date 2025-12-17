@@ -10,10 +10,12 @@ contract MerkleAirdrop {
     // Some list of addresses
     // Allow some in the list to claim tokens
     error MerkleAirdrop__InvalidProof();
+    error MerkleAirdrop__hasClaimed();
 
     address[] claimers;
     bytes32 private immutable i_merkleRoot;
     IERC20 private immutable i_airdropToken;
+    mapping(address claimer => bool claimed) public s_hasClaimed;
 
     event Claim(address account, uint256 amount);
 
@@ -23,6 +25,9 @@ contract MerkleAirdrop {
     }
 
     function claim(address account, uint256 amount, bytes32[] calldata merkleProof) external {
+        if (s_hasClaimed[account]) {
+            revert MerkleAirdrop__hasClaimed();
+        }
         // calculate uing the account and amount, the hash -> leaf node
         bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount)))); 
             // When using Merkle trees, we need to do something very partivular:
@@ -31,9 +36,9 @@ contract MerkleAirdrop {
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             revert MerkleAirdrop__InvalidProof();
         }
+        s_hasClaimed[account] = true;
         emit Claim(account, amount);
         i_airdropToken.safeTransfer(account, amount);
-
     }
 
 }
