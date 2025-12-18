@@ -29,10 +29,10 @@ contract MerkleAirdrop {
             revert MerkleAirdrop__hasClaimed();
         }
         // calculate uing the account and amount, the hash -> leaf node
-        bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount)))); 
-            // When using Merkle trees, we need to do something very partivular:
-                // We have to hash it twice and before we do that we need to concatenate the bytes
-                // Why? avoid collisions and second pre-image attacks
+        bytes32 leaf = keccak256(bytes.concat(keccak256(abi.encode(account, amount))));
+        // When using Merkle trees, we need to do something very partivular:
+        // We have to hash it twice and before we do that we need to concatenate the bytes
+        // Why? avoid collisions and second pre-image attacks
         if (!MerkleProof.verify(merkleProof, i_merkleRoot, leaf)) {
             revert MerkleAirdrop__InvalidProof();
         }
