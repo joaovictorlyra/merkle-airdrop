@@ -3,7 +3,7 @@
 pragma solidity ^0.8.24;
 
 import {Script} from "forge-std/Script.sol";
-import {DevOpsTools} from "foundry-devops/DevOpsTools.sol";
+import { DevOpsTools } from "foundry-devops/src/DevOpsTools.sol";
 import {MerkleAirdrop} from "../src/MerkleAirdrop.sol";
 
 contract ClaimAirdrop is Script {
@@ -19,14 +19,13 @@ contract ClaimAirdrop is Script {
 
 
     function claimAirdrop(address airdrop) public {
-        vm.startBroadcast();
-        (uint8 v, bytes32 r, bytes32 s) = 
-            
+        vm.startBroadcast();      
+        (uint8 v, bytes32 r, bytes32 s) = splitSignature(SIGNATURE);
         MerkleAirdrop(airdrop).claim(CLAIMING_ADDRESS, CLAIMING_AMOUNT, PROOF, v, r, s);
         vm.stopBroadcast();
     }
 
-    function splitSignature(bytes memory sig) public pure returns (uint8, bytes32, bytes32) {
+    function splitSignature(bytes memory sig) public pure returns (uint8 v, bytes32 r, bytes32 s) {
         if (sig.length != 65) {
             revert __ClaimAirdropScript__InvalidSignatureLength();
         }
